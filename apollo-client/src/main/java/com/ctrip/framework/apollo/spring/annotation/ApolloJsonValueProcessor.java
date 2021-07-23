@@ -23,6 +23,12 @@ import org.springframework.util.ReflectionUtils;
 
 /**
  * Create by zhangzheng on 2018/2/6
+ *
+ * https://www.cnblogs.com/kebibuluan/p/14432019.html
+ *
+ * 处理ApolloJsonValue注解，属性或者方法中包含ApolloJsonValue注解的Bean，
+ * 属性值也会根据配置中心配置的修改发生变化，因此也需要添加到配置中心可配的容器中
+ *
  */
 public class ApolloJsonValueProcessor extends ApolloProcessor implements BeanFactoryAware {
 

@@ -29,6 +29,12 @@ import org.springframework.context.annotation.Bean;
  *
  * @author github.com/zhegexiaohuozi  seimimaster@gmail.com
  * @since 2017/12/20.
+ *
+ * https://www.cnblogs.com/kebibuluan/p/14432019.html
+ *
+ * 仅仅是为了获取SpringValueDefinitionProcessor中获取的 包含${…}参数占位符的BeanDefinition
+ * （从面向对象设计原则的角度，不符合单一责任原则，可以注册到Guice容器里，然后从Guice容器获取。）
+ *
  */
 public class SpringValueProcessor extends ApolloProcessor implements BeanFactoryPostProcessor {
 

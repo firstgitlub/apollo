@@ -35,6 +35,24 @@ import java.util.Iterator;
  * - {@link com.ctrip.framework.apollo.spring.annotation.ApolloConfigRegistrar}
  *
  * @author Jason Song(song_s@ctrip.com)
+ *
+ *
+ * https://www.cnblogs.com/kebibuluan/p/14432019.html
+ *
+ *  （1）根据命名空间(app_id)从配置中心获取配置信息，
+ *      创建 RemoteConfigRepository 和 LocalFileConfigRepository 对象。
+ *      RemoteConfigRepository 表示远程配置中心资源，LocalFileConfigRepository 表示本地缓存配置资源。
+ *
+ * （2）LocalFileConfigRepository对象缓存配置信息到C:\opt\data 或者/opt/data目录。
+ *
+ * （3）RemoteConfigRepository 开启HTTP长轮询请求定时任务，默认2s请求一次。
+ *
+ * （4）將本地缓存配置信息转换为 PropertySource 对象（Apollo自定义了Spring的PropertySource），
+ *     加载到Spring的Environment对象中。
+ *
+ * （5）將自定义的 ConfigPropertySource 注册为观察者。一旦 RemoteConfigRepository 发现远程配置中心信息发生变化，
+ *     ConfigPropertySource 对象会得到通知。
+ *
  */
 public class PropertySourcesProcessor implements BeanFactoryPostProcessor, EnvironmentAware, PriorityOrdered {
   private static final Multimap<Integer, String> NAMESPACE_NAMES = LinkedHashMultimap.create();

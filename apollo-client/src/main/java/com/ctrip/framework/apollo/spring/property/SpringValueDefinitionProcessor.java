@@ -28,9 +28,16 @@ import com.google.common.collect.Multimap;
  *    &lt;property name=&quot;batch&quot; value=&quot;${batch:100}&quot;/&gt;
  *  &lt;/bean&gt;
  * </pre>
+ *
+ * https://www.cnblogs.com/kebibuluan/p/14432019.html
+ *
+ * 对所有的BeanDefinition进行遍历，將属性中包含${…}参数占位符的属性添加到Apollo 属性注册表。Apollo 属性注册表具体结构如下：
+ *
  */
 public class SpringValueDefinitionProcessor implements BeanDefinitionRegistryPostProcessor {
-  private static final Multimap<String, SpringValueDefinition> beanName2SpringValueDefinitions =
+
+  private static final Multimap<String/*beanName*/,
+      SpringValueDefinition/*具体的替换位置的详情信息*/> beanName2SpringValueDefinitions =
       LinkedListMultimap.create();
   private static final AtomicBoolean initialized = new AtomicBoolean(false);
 
@@ -65,10 +72,12 @@ public class SpringValueDefinitionProcessor implements BeanDefinitionRegistryPos
     }
 
     String[] beanNames = beanRegistry.getBeanDefinitionNames();
+    // 遍历所有的BeanDefinition
     for (String beanName : beanNames) {
       BeanDefinition beanDefinition = beanRegistry.getBeanDefinition(beanName);
       MutablePropertyValues mutablePropertyValues = beanDefinition.getPropertyValues();
       List<PropertyValue> propertyValues = mutablePropertyValues.getPropertyValueList();
+      // 遍历当前beanDefinition中包含的 有${...} 的属性
       for (PropertyValue propertyValue : propertyValues) {
         Object value = propertyValue.getValue();
         if (!(value instanceof TypedStringValue)) {

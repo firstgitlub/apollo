@@ -63,6 +63,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   private static final Escaper pathEscaper = UrlEscapers.urlPathSegmentEscaper();
   private static final Escaper queryParamEscaper = UrlEscapers.urlFormParameterEscaper();
 
+  // 初始化守护线程 核心线程数是1
   static {
     m_executorService = Executors.newScheduledThreadPool(1,
         ApolloThreadFactory.create("RemoteConfigRepository", true));
@@ -97,6 +98,8 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     if (m_configCache.get() == null) {
       this.sync();
     }
+    // 这里是做的属性转换
+    // 將本地缓存配置信息转换为PropertySource对象（Apollo自定义了Spring的PropertySource），加载到Spring的Environment对象中
     return transformApolloConfigToProperties(m_configCache.get());
   }
 
@@ -126,10 +129,13 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     Transaction transaction = Tracer.newTransaction("Apollo.ConfigService", "syncRemoteConfig");
 
     try {
+      // 上一次的
       ApolloConfig previous = m_configCache.get();
+      // 最新的
       ApolloConfig current = loadApolloConfig();
 
       //reference equals means HTTP 304
+      // 引用等于HTTP 304
       if (previous != current) {
         logger.debug("Remote Config refreshed!");
         m_configCache.set(current);
@@ -159,6 +165,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   private ApolloConfig loadApolloConfig() {
     if (!m_loadConfigRateLimiter.tryAcquire(5, TimeUnit.SECONDS)) {
       //wait at most 5 seconds
+      // 等待最多5秒
       try {
         TimeUnit.SECONDS.sleep(5);
       } catch (InterruptedException e) {
@@ -172,12 +179,14 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
     long onErrorSleepTime = 0; // 0 means no sleep
     Throwable exception = null;
 
+    // 通过和 Apollo服务器建立HTTP请求  获取对应的服务信息 其中最大重试次数是2次  程序写死的
     List<ServiceDTO> configServices = getConfigServices();
     String url = null;
     for (int i = 0; i < maxRetries; i++) {
       List<ServiceDTO> randomConfigServices = Lists.newLinkedList(configServices);
       Collections.shuffle(randomConfigServices);
       //Access the server which notifies the client first
+      // 访问首先通知客户端的服务器
       if (m_longPollServiceDto.get() != null) {
         randomConfigServices.add(0, m_longPollServiceDto.getAndSet(null));
       }
@@ -205,6 +214,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
         transaction.addData("Url", url);
         try {
 
+          // 这里应该就是获取到远端Apollo服务器上的配置数据了
           HttpResponse<ApolloConfig> response = m_httpUtil.doGet(request, ApolloConfig.class);
           m_configNeedForceRefresh.set(false);
           m_loadConfigFailSchedulePolicy.success();
@@ -310,6 +320,7 @@ public class RemoteConfigRepository extends AbstractConfigRepository {
   }
 
   private List<ServiceDTO> getConfigServices() {
+    // Locator :定位器
     List<ServiceDTO> services = m_serviceLocator.getConfigServices();
     if (services.size() == 0) {
       throw new ApolloConfigException("No available config service");

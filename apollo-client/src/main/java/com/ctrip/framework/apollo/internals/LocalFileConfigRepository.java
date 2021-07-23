@@ -104,6 +104,15 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     upstreamConfigRepository.addChangeListener(this);
   }
 
+  /**
+   *
+   * 当轮训获取到的 远端服务配置有改变之后 会在本地发出 RepositoryChange的事件，本地的文件仓库监听到
+   *  以后，会去执行更新本地容器中的对应bean的属性信息
+   *
+   *
+   * @param namespace the namespace of this repository change
+   * @param newProperties the properties after change
+   */
   @Override
   public void onRepositoryChange(String namespace, Properties newProperties) {
     if (newProperties.equals(m_fileProperties)) {
@@ -206,6 +215,7 @@ public class LocalFileConfigRepository extends AbstractConfigRepository
     return properties;
   }
 
+  // 持久化 本地缓存文件
   void persistLocalCacheFile(File baseDir, String namespace) {
     if (baseDir == null) {
       return;

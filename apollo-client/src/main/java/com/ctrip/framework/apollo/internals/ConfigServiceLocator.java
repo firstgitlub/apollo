@@ -141,9 +141,11 @@ public class ConfigServiceLocator {
   }
 
   private synchronized void updateConfigServices() {
+    // assemble：装配
     String url = assembleMetaServiceUrl();
 
     HttpRequest request = new HttpRequest(url);
+    // 最大重试两次
     int maxRetries = 2;
     Throwable exception = null;
 

@@ -61,6 +61,7 @@ public class ApolloAnnotationProcessor extends ApolloProcessor {
     for (String namespace : namespaces) {
       Config config = ConfigService.getConfig(namespace);
 
+      // 处理ApolloConfigChangeListener注解，ApolloConfigChangeListener 注解用于注册一个配置变化监听器。
       config.addChangeListener(configChangeListener);
     }
   }
