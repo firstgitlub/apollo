@@ -19,6 +19,10 @@ import java.util.Collection;
  *
  * https://www.cnblogs.com/kebibuluan/p/14432019.html
  *
+ * https://www.cnblogs.com/kebibuluan/p/14435592.html
+ *
+ * 结合这两篇文章 即可完成 apollo 的实现原理完善
+ *
  */
 public class SpringValueRegistry {
   private final Multimap<String, SpringValue> registry = LinkedListMultimap.create();
